@@ -1,93 +1,144 @@
 package src;
 
-import java.util.*;
-class CricketMatch {
-    private static final int totalBallsPerOver = 6;
-    private static final int toalOvers = 10;
-    private static final int totalBatsmen = 11;
+import java.util.Date;
 
-    private int team1Score = 0;
-    private int team2Score = 0;
-    private int team1Wickets = 0;
-    private int team2Wickets = 0;
-    private String[] team1Players = {"Rohit Sharma", "Shubman Gill", "Virat Kohli", "KL Rahul", "Ishan Kishan", "Hardik Pandya", "Ravindra Jadeja", "Washington Sundar", "Kuldeep Yadav", "Mohammed Siraj","jasprit Bumrah"};
-    private String[] team2Players = {"Pathumn Nissanka", "Kusal Perera", "Kusal Mendis", "Sadeera Samarawickrama", "Charith Asalanka", "Dhananjaya de Silva", "Dasun Shanaka", "Dunith Wellalage", "Dushan Hemantha", "Pramod Madushan","Mateesha"};
-    private Random r = new Random();
-    public synchronized void playInnings(String teamName, String[] players) {
-        System.out.println(teamName + " is batting first");
-        int totalRuns = 0;
-        int wickets = 0;
-        for (int over = 1; over <= toalOvers; over++) {
-            System.out.println("Over " + over);
-            for (int ball = 1; ball <= totalBallsPerOver; ball++) {
-                int run = r.nextInt(8); // 0 to 7
-                if (run == 0) {
-                    wickets++;
-                    System.out.println(players[wickets - 1] + " is out!");
-                    if (wickets == totalBatsmen) {
-                        break;
-                    }
+public class Codeathon08_Murali {
+    public static void main(String arg[])  {
+        String teamA[] = {"Rohit Sharma", "Shubman Gill", "Virat Kohli", "KL Rahul", "Ishan Kishan",
+                "Hardik Pandya", "Ravindra Jadeja", "Washington Sundar", "Kuldeep Yadav",
+                "Mohammed Siraj", "Jasprit Bumrah"};
+        String teamB[] = {"Pathum Nissanka", "Kusal Perera", "Kusal Mendis", "Sadeera Samarawickrama",
+                "Charith Asalanka", "Dhananjaya de Silva", "Dasun Shanaka", "Dunith Wellalage",
+                "Dushan Hemantha", "Pramod Madushan", "Matheesha Pathirana"};
+        CricketTeam india = new CricketTeam("India", teamA);
+        CricketTeam sriLanka = new CricketTeam("Sri Lanka", teamB);
+        Thread teamAThread = new Thread(india);
+        Thread teamBThread = new Thread(sriLanka);
+        double r = Math.random() * 10;
+        double toss = r % 2;
+        for(int i = 0; i < 2; i++) {
+            if(toss > 0 && toss < 1) {
+                if(i == 0) {
+                    System.out.println("India Batting first");
                 } else {
-                    totalRuns += run;
-                    System.out.println(players[wickets] + " scored " + run);
+                    System.out.println("\nIndia Batting Second");
                 }
-            }
-        }
-        if (teamName.equals("India")) {
-            team1Score = totalRuns;
-            team1Wickets = wickets;
-        } else {
-            team2Score = totalRuns;
-            team2Wickets = wickets;
-        }
-    }
-    public void startMatch() {
-        double toss = Math.random() * 2;
-        if (toss < 1) {
-            System.out.println("toss won by India");
-            playInnings("India", team1Players);
-            playInnings("Sri Lanka", team2Players);
-        } else {
-            System.out.println("toss won by Sri Lanka");
-            playInnings("Sri Lanka", team2Players);
-            playInnings("India", team1Players);
-        }
-        System.out.println("india-batting scoresheet");
-        display("India", team1Players, team1Score, team1Wickets);
-        System.out.println("Sri Lanka - batting scoresheet");
-        display("Sri Lanka", team2Players, team2Score, team2Wickets);
-        if (team1Score > team2Score) {
-            System.out.println("Match Result: Team 1 (India) Won By " + (team1Score - team2Score) + " Runs");
-        } else if (team1Score < team2Score) {
-            System.out.println("Match Result: Team 2 (Sri Lanka) Won By " + (team2Score - team1Score) + " Runs");
-        } else {
-            System.out.println("match result: match tied");
-        }
-    }
-    private void display(String teamName, String[] players, int totalScore, int wickets) {
-        for (int i = 0; i < players.length; i++) {
-            System.out.println(players[i] + " " + getRandomScore(players[i]) + " (" + (i < wickets ? "Out" : "Not Out") + ")");
-        }
-        System.out.println("Extras " + getRandomScore("Extras") + " Total Score " + totalScore + " in " + (wickets > 0 ? (toalOvers - 1) : toalOvers) + " overs");
-    }
-    private String getRandomScore(String playerName) {
-        StringBuilder scorecard = new StringBuilder();
-        for (int i = 0; i < 6; i++) {
-            int run = r.nextInt(8);
-            if (run == 7) {
-                scorecard.append("E,");
+                teamAThread.start();
+                try {
+                    teamAThread.join();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                toss = 1.5;
             } else {
-                scorecard.append(run).append(" ");
+                if(i == 0) {
+                    System.out.println("Sri Lanka Batting first");
+                } else {
+                    System.out.println("\nSri Lanka Batting Second");
+                }
+                teamBThread.start();
+                try {
+                    teamBThread.join();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                toss = 0.5;
             }
         }
-        scorecard.deleteCharAt(scorecard.length() - 1);
-        return playerName + " " + scorecard.toString();
+        if(india.totalScore > sriLanka.totalScore) {
+            System.out.println("India Won By " + (india.totalScore - sriLanka.totalScore));
+            System.out.println("Today date: = " + new Date());
+        }
+        if(sriLanka.totalScore > india.totalScore) {
+            System.out.println("Sri Lanka Won By " + (sriLanka.totalScore - india.totalScore));
+            System.out.println("Today date: = " + new Date());
+        }
     }
 }
-public class Codeathon08_Murali {
-    public static void main(String[] args) {
-        CricketMatch cm = new CricketMatch();
-        cm.startMatch();
-        System.out.println("won the cup");
+
+class CricketTeam implements Runnable {
+    String teamName;
+    String playerName[];
+    int totalScore = 0;
+    int runsPerBall[];
+    CricketPlayer players[];
+
+    CricketTeam(String team, String player[]) {
+        teamName = team;
+        playerName = player;
+        runsPerBall = new int[60];
+        players = new CricketPlayer[11];
+    }
+
+    @Override
+    public void run() {
+        int ballsBowled = 0;
+        int extras = 0;
+        int totalRuns = 0;
+
+        for (int i = 0; i < 11; i++) {
+            players[i] = new CricketPlayer(teamName, playerName[i]);
+            totalRuns = 0;
+            int ballLength = 0;
+            extras = 0;
+            for (int j = 0; ballsBowled < 60; j++) {
+                double random = Math.random() * 10;
+                int runs = (int) random % 8;
+                ballsBowled++;
+                ballLength++;
+                totalRuns += runs;
+                if (runs == 7) {
+                    extras++;
+                    runs = 6;
+                }
+                runsPerBall[j] = runs;
+                if (runs == 0) {
+                    break;
+                }
+            }
+            if (ballLength == 0) {
+                players[i].runsPerBall = new int[]{0, 0, 0};
+            } else {
+                players[i].runsPerBall = runsPerBall;
+            }
+            players[i].ballsBowled = ballLength;
+            players[i].extras = extras;
+            players[i].totalRuns = totalRuns;
+            display(players[i]);
+        }
+        for (int i = 0; i < 10; i++) {
+            totalScore = totalScore + players[i].totalRuns;
+        }
+        double overs = (double) ballsBowled / 6;
+        System.out.println("\nTotal Score = " + totalScore + " total Overs = " + (int) (Math.round(overs * 10)) / 10.0);
+    }
+
+    void display(CricketPlayer player) {
+        System.out.print(player.playerName + " " + player.ballsBowled + "(");
+        for (int i = 0; i < 60; i++) {
+            System.out.print(player.runsPerBall[i]);
+            if (player.runsPerBall[i] == 0) {
+                break;
+            } else {
+                System.out.print(",");
+            }
+        }
+        System.out.print(") = " + player.totalRuns + "  (total extra = " + player.extras + ")");
+        System.out.println();
+    }
+}
+
+class CricketPlayer {
+    String teamName;
+    String playerName;
+    int ballsBowled;
+    int extras;
+    int[] runsPerBall;
+    int totalRuns;
+
+    CricketPlayer(String team, String player) {
+        teamName = team;
+        playerName = player;
+        runsPerBall = new int[60];
     }
 }
